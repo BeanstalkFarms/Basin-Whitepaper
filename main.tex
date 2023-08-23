@@ -26,19 +26,6 @@
 \usepackage{tocloft,titletoc} % TOC package
 \usepackage{titlesec} % Section spacing
 
-
-%%%%%%%%% DRAFT WATERMARK %%%%%%%%%
-\usepackage{draftwatermark}
-
-
-\SetWatermarkAngle{45} 
-\SetWatermarkLightness{.93} 
-\SetWatermarkFontSize{10cm} 
-\SetWatermarkScale{7} 
-\SetWatermarkText{\tt{DRAFT}}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 % Paper formatting
 \newlength\LabelWidth
 \setlength\parindent{0pt}
@@ -161,7 +148,7 @@ urlcolor=black,
 \newcommand{\lambdabean}{\includesvg[scale=0.17]{./logos/microbean.svg}} % Bean used in formulas for lambda superscript - micro bean
 
 % Basin symbols
-\newcommand{\BasinCover}{\includesvg[scale=0.15]{./logos/black-basin.svg}} % Logo on cover page
+\newcommand{\BasinCover}{\includesvg[scale=0.15]{./logos/black-basin-v2.svg}} % Logo on cover page
 
 % List Key
 \SetEnumitemKey{midsep}{topsep=0pt, itemsep=3pt} % Itemize key
@@ -185,25 +172,41 @@ urlcolor=black,
 \BasinCover
 \end{center}
 \vspace{0.4cm}
-\large{Publius, Brean, Silo Chad, Beanstalk Farms}
 
-\vspace{-0.25cm}
-\normalsize{EMAIL UPDATE}
+\begin{center}
+    \begin{tabular}{>{\centering\arraybackslash}p{5cm} >{\centering\arraybackslash}p{5cm}}
+        \large{Brendan Sanderson} & \large{Ben Weintraub} \\
+        \href{mailto:brendan@manifestcrypto.org}{\normalsize{brendan@manifestcrypto.org}} & \href{mailto:ben@manifestcrypto.org}{\normalsize{ben@manifestcrypto.org}}
+    \end{tabular}
+\end{center}
 
-\vspace{-0.25cm}
-\normalsize{\href{https://bean.money/}{WEBSITE ADDRESS UPDATE}}
+\begin{center}
+    \begin{tabular}{>{\centering\arraybackslash}p{5cm} >{\centering\arraybackslash}p{5cm}}
+        \large{Brean} & \large{Silo Chad} \\
+        \href{mailto:brean.beanstalk@protonmail.com}{\normalsize{brean.beanstalk@protonmail.com}} & \href{mailto:silochad@protonmail.com}{\normalsize{silochad@protonmail.com}}
+    \end{tabular}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{>{\centering\arraybackslash}p{10cm}}
+        \large{Beanstalk Farms} \\
+        \href{mailto:beanstalkfarms@protonmail.com}{\normalsize{beanstalkfarms@protonmail.com}}
+    \end{tabular}
+\end{center}
+
+\normalsize{\href{https://basin.exchange/}{basin.exchange}}
 
 \vspace{0.4cm}
-\footnotesize{Published:} \normalsize{UPDATE}
+\footnotesize{Published:} \normalsize{August 23, 2023}
 
 \vspace{-0.25cm}
-\footnotesize{Modified:} \normalsize{June UPDATE, 2023}
+\footnotesize{Modified:} \normalsize{August 23, 2023}
 
 \vspace{-0.25cm}
 \footnotesize{Whitepaper Version:} {\normalsize{1.0.0}}
 
 \vspace{-0.25cm}
-\footnotesize{Code Version:} \href{https://github.com/UPDATE}{\normalsize{1.0.0}}\footnote{\href{https://github.com/UPDATE}{UPDATE}}
+\footnotesize{Code Version:} \href{https://github.com/BeanstalkFarms/Basin}{\normalsize{1.0.0}}\footnote{\href{https://github.com/BeanstalkFarms/Basin}{github.com/BeanstalkFarms/Basin}}
 
 
 \vspace{0.1cm}
@@ -212,7 +215,7 @@ urlcolor=black,
 \normalsize{\hspace{2.5em}- Chris Dixon, October 23, 2021}\fref{twitter.com/cdixon/status/1451703067213066244}
 \vspace{0.4cm}
 \begin{abstract}
-\justified{\normalsize{\noindent Exchanging is a core piece of economic activity. However, current decentralized exchange (DEX) architectures are not composable, such that adding an exchange function or oracle to them is difficult. The nature of open source software is that each problem should only need to be solved once in a given execution environment. Non-composable DEX architectures prevent this. We propose an EVM-native DEX architecture which (1) allows for composing arbitrary exchange functions, oracles and exchange implementations for ERC-20 Standard\fref{eips.ethereum.org/EIPS/eip-20} tokens and (2) includes a registry to verify exchange implementations.}}
+\justified{\normalsize{\noindent Exchanging is a core piece of economic activity. However, current decentralized exchange (DEX) architectures are not composable, such that adding an exchange function or oracle to them is difficult. The nature of open source software is that each problem should only need to be solved once in a given execution environment. Non-composable DEX architectures prevent this. We propose an EVM-native DEX architecture that (1) allows for composing arbitrary exchange functions, oracles and exchange implementations for ERC-20 Standard\fref{eips.ethereum.org/EIPS/eip-20} tokens and (2) includes a registry to verify exchange implementations.}}
 \end{abstract}
 \end{center}
 \end{titlepage}
@@ -237,20 +240,23 @@ urlcolor=black,
 \setcounter{page}{3} % Begin page numbering
 
 \section{Introduction}
-Despite the outsized importance of DEX protocols to the permissionless economy, innovation of them has been slow. The primary components of a decentralized exchange protocol are (1) exchange functions, which specify the conditions under which a given asset can be exchanged for another, (2) oracles, which save data related to the exchange relevant to other protocols that need to permissionlessly and atomically query the exchange's state, and (3) exchange implementations that facilitate the use (\textit{i.e.}, swapping, adding and removing liquidity) of the exchange. One major problem with current decentralized exchange architectures is a lack of composability, such that to add, remove or replace a component of a decentralized exchange requires writing an entire exchange protocol. This is highly inefficient.
+Despite the outsized importance of DEX protocols to the permissionless economy, innovation of them has been slow. One major problem with current decentralized exchange architectures is a lack of composability, such that to add, remove or replace a component of a decentralized exchange requires writing an entire exchange protocol. This is highly inefficient.
 
-Utility of decentralized exchanges has been limited in part because current DEX architectures mandate market makers provide liquidity using a finite set of exchange functions that are provided by the DEX. This limits the flexibility and capital efficiency of market makers' liquidity. Lack of liquidity flexibility and capital efficiency make profitably market making on DEXs excessively difficult. Profitable market making is essential for well functioning liquid markets. Excessive friction to customizing exchange functions to provide liquidity on decentralized exchanges makes it difficult for decentralized permissionless trading environments to compete with centralized permissioned ones in attracting market makers. A shortage of market makers leads to a shortage of liquidity; a shortage of liquidity leads to a lack of utility for takers. 
+The primary components of a decentralized exchange protocol are (1) exchange functions, which specify the conditions under which a given asset can be exchanged for another, (2) oracles, which save data related to the exchange relevant to other protocols that need to permissionlessly and atomically query the exchange's state and (3) exchange implementations that facilitate use (\textit{i.e.}, swapping, adding and removing liquidity) of the exchange.
 
-Saving oracle data on a decentralized network is expensive. The only reason to save DEX data in a network-native oracle is so that it can be queried permissionlessly by other network-native protocols. Current DEX architectures mandate using a particular oracle, independent of whether the data saved about the liquidity is being used by other network-native protocols. Because the cost to saving oracle data is passed on to users of the protocol, this policy imposes an often unnecessary cost on all users of the DEX. 
+Utility of decentralized exchanges has been limited in part because current DEX architectures mandate market makers provide liquidity using a finite set of exchange functions that are provided by the DEX. This limits the flexibility and capital efficiency of market makers' liquidity. Lack of flexibility and capital efficiency of liquidity make profitably market making on DEXs excessively difficult. Profitable market making is essential for well functioning liquid markets. Excessive friction to customizing exchange functions to provide liquidity on decentralized exchanges makes it difficult for decentralized permissionless trading environments to compete with centralized permissioned ones in attracting market makers. A shortage of market makers leads to a shortage of liquidity; a shortage of liquidity leads to a lack of utility for takers. 
 
-In a post-Merge\fref{ethereum.org/en/roadmap/merge/} environment, the risk of oracle manipulation due to multi-block maximum extractable value (MEV) attacks has risen dramatically\fref{alrevuelta.github.io/posts/ethereum-mev-multiblock}. This has made using existing network-native oracle solutions risky and impractical for protocols that require manipulation resistant oracles. Upgrading the oracles in existing DEXs to be multi-block MEV resistant is impossible due to the lack of composability between exchange functions and oracles. As a result, protocols are forced to use non-network-native oracle solutions which require additional trust assumptions beyond the integrity of the network itself\fref{liquity.org/blog/price-oracles-in-liquity} while users of DEXs are still paying to update useless oracles.
+Saving oracle data on a decentralized network is expensive. The only reason to save DEX data in a network-native oracle is so that it can be queried atomically and permissionlessly by other network-native protocols. Current DEX architectures mandate using a particular oracle, independent of whether the data saved is being used by other network-native protocols. Because the cost to saving oracle data is typically passed on to takers of the DEX, this policy imposes an often unnecessary cost on all takers. 
 
-Basin is an open source permissionless decentralized exchange architecture that allows for the composition of arbitrary exchange functions, network-native oracles and exchange implementations into a single liquidity pool. A registry of pool implementations allows for users to verify the accuracy of a pool's use of its exchange function, oracles and exchange implementation. Anyone can deploy new exchange functions, network-native oracles, exchange implementations and registries. Similarly, anyone can deploy a new pool through an existing registry with an exchange function, any (or no) network-native oracles and an exchange implementation included in the registry. In practice, Basin lowers the friction for market makers to deploy liquidity with custom orders and allow their liquidity to be used by other network-native protocols without additional trust assumptions.
+In a post-Merge\fref{ethereum.org/en/roadmap/merge/} environment, the risk of oracle manipulation due to multi-block maximum extractable value (MEV) attacks has risen dramatically.\fref{alrevuelta.github.io/posts/ethereum-mev-multiblock} This has made using existing network-native oracle solutions risky and impractical for protocols that require manipulation resistant oracles. Upgrading the oracles in existing DEXs to be multi-block MEV resistant is impossible due to the lack of composability between exchange functions and oracles. As a result, protocols are forced to use non-network-native oracle solutions that require additional trust assumptions beyond the integrity of the network itself,\fref{liquity.org/blog/price-oracles-in-liquity} while takers are still paying to update useless oracles.
+
+Basin is an open source permissionless decentralized exchange architecture that allows for the composition of arbitrary exchange functions, network-native oracles and exchange implementations into a single liquidity pool. A registry of pool implementations allows for users to verify the accuracy of a pool's use of its exchange function, oracles and exchange implementation. Anyone can deploy new exchange functions, network-native oracles, exchange implementations and registries. Similarly, anyone can deploy a new pool through an existing registry with an exchange function, any (or no) network-native oracles and an exchange implementation included in the registry. In practice, Basin lowers the friction for market makers to deploy liquidity with custom exchange functions
+ and allows their liquidity to be used by other network-native protocols without additional trust assumptions.
 
 \section{Previous Work}
 Basin is the next step in the evolution of EVM-native DEXs.
 
-A robust, trustless computer network that supports composability and fungible token standards (\textit{i.e.}, Ethereum) is necessary to host a DEX. Basin supports the exchange of ERC-20 tokens.
+A robust, trustless computer network that supports composability and fungible token standards (\textit{e.g.}, Ethereum) is necessary to host a DEX. Basin supports the exchange of ERC-20 tokens.
 
 Uniswap\fref{uniswap.org} pioneered use of the constant product exchange function that has been immensely popular for market making long-tail assets despite its capital inefficiency. Uniswap has also innovated on manipulation resistant network-native oracles by moving from a simple moving average (SMA) of an arithmetic mean,\fref{uniswap.org/whitepaper.pdf} which weights outliers equally to all other data points, to an SMA of a geometric mean,\fref{uniswap.org/whitepaper-v3.pdf} which weights certain outliers significantly less.
 
@@ -261,47 +267,49 @@ Solidly\fref{solidly.exchange/} allowed for the use of more than one exchange fu
 \section{Basin}
 Well designed open source protocols enable anyone to (1) compose existing components together, (2) develop new components when existing ones fail to meet the needs of users or are cost-inefficient and (3) verify the proper use of existing components in a simple fashion. Basin allows for anyone to compose new and existing (1) \term{Well Functions} (\textit{i.e.} exchange functions), (2) \term{Pumps} (\textit{i.e.}, network-native oracles) and (3) \term{Well Implementations} (\textit{i.e.}, exchange implementations) to create a \term{Well} (\textit{i.e.}, a customized liquidity pool). \term{Aquifers} (\textit{i.e.}, \term{Well} registries) store a mapping from \term{Well} addresses to \term{Well Implementations} to enable verification of a \term{Well Implementation} given a \term{Well} address. \term{Aqueducts} (\textit{i.e.}, \term{Well} whitelists) store a list of approved \term{Well Functions}, \term{Pumps}, \term{Well Implementations} and \term{Aquifers} to create a single point of trust for users.
 
-\subsection{Well}
-A \term{Well} allows for the provisioning of liquidity into a single on-chain position that follows arbitrary rules and is represented by an ERC-20 token (\textit{i.e.}, a \term{Well} LP Token). Each \term{Well} is defined by (1) a list of tokens, which contains the set of ERC-20 tokens that the \term{Well} supports (\textit{i.e.}, that can be exchanged through, added to, and removed from the \term{Well}), (2) a \term{Well Function} and its associated data, which defines an invariant relationship between the \term{Well's} \term{Reserves} (\textit{i.e.}, the balances of tokens in (1) at the time of the last supported \term{Well} operation) and the supply of \term{Well} LP tokens, (3) \term{Pumps} and their associated data, which implement network-native oracles that are updated each time associated \term{Well's} \term{Reserves} may change, (4) a \term{Well Implementation}, which contains all logic for actions supported by the \term{Well}, (5) optional arbitrary additional data used by the \term{Well}, and (6) the \term{Aquifer} that deployed the \term{Well}.
+A \term{Well} allows for the provisioning of liquidity into a single on-chain position that follows arbitrary rules and is represented by an ERC-20 token (\textit{i.e.}, a \term{Well} LP Token). Each \term{Well} is defined by (1) a list of tokens, which contains the set of ERC-20 tokens that the \term{Well} supports (\textit{i.e.}, that can be exchanged through, added to, and removed from the \term{Well}), (2) a \term{Well Function} and its associated data, which defines an invariant relationship between the \term{Well's} \term{Reserves} (\textit{i.e.}, the balances of tokens in (1) at the time of the last supported \term{Well} operation) and the supply of \term{Well} LP tokens, (3) \term{Pumps} and their associated data, which implement network-native oracles that are updated each time associated \term{Well's} \term{Reserves} may change, (4) a \term{Well Implementation}, which contains all logic for actions supported by the \term{Well}, (5) optional arbitrary additional data used by the \term{Well} and (6) the \term{Aquifer} that deployed the \term{Well}.
 
-\newpage
-A \term{Well's} (1) address and its associated data, (2) list of tokens, (3) \term{Well Function} and its associated data, (4) \term{Pumps} and their associated data and (5) deploying \term{Aquifer} can be stored as immutable data, in contract storage or as appended bytecode. The associated data of the \term{Well} address, \term{Well Function} and \term{Pumps} are optional and can be arbitrary. Requirements for and use of the associated data of the \term{Well} address is specified by the \term{Aquifer}; requirements for and use of the associated data of the \term{Well Function} and \term{Pumps} is specified by the \term{Well Implementation}. 
+A \term{Well's} state consists of its \term{Reserve} balances and \term{Well} LP token ownership.  \term{Well} LP tokens are ERC-20 tokens representing pro-rata ownership of the \term{Well’s} \term{Reserves} and implement ERC-2612.\fref{eips.ethereum.org/EIPS/eip-2612} \term{Well Functions} and \term{Pumps} can be independently chosen to be stateful or stateless, while \term{Well Implementations} are stateful. Including \term{Pumps} in a \term{Well} is optional.
 
-A \term{Well's} state consists of its \term{Reserve} balances and \term{Well} LP token ownership.  \term{Well} LP tokens are ERC-20 tokens representing pro-rata ownership of the \term{Well’s} \term{Reserves} and implement ERC-2612\fref{eips.ethereum.org/EIPS/eip-2612}. \term{Well Functions} and \term{Pumps} can are independently chosen to be stateful or stateless, while \term{Well Implementations} are stateful. Including \term{Pumps} in a \term{Well} is optional.
+A \term{Well's} (1) address and its associated data, (2) list of tokens, (3) \term{Well Function} and its associated data, (4) \term{Pumps} and their associated data and (5) deploying \term{Aquifer}, can be stored as immutable data in contract storage or as appended bytecode. The associated data of the \term{Well} address, \term{Well Function} and \term{Pumps} are optional and can be arbitrary. Requirements for and use of the associated data of the \term{Well} address are specified by the \term{Aquifer}; requirements for and use of the associated data of the \term{Well Function} and \term{Pumps} are specified by the \term{Well Implementation}. 
 
 \subsection{Well Function}
+\vspace*{-0.1cm}
 A \term{Well Function} defines an invariant relationship between a \term{Well's} \term{Reserves} and the supply of \term{Well} LP tokens. Basin supports \term{Well Functions} that contain arbitrary logic. However, \term{Well Functions} must be deterministic to be used alongside \term{Pumps}. In practice, the handling of arbitrary logic in a \term{Well Function} allows for arbitrary order creation (i.e., conditional orders that take network state data as inputs).
 
 \subsection{Pump}
-\term{Pumps} are a generalized framework for network-native oracles. A \term{Pump} is updated upon each interaction with a \term{Well} that uses it. A \term{Pump} can be shared by multiple \term{Wells} if it stores a mapping of \term{Well} addresses. Each \term{Pump} can determine its own method of recording a \term{Well's} \term{Reserves}. 
+\vspace*{-0.1cm}
+\term{Pumps} are a generalized framework for network-native oracles. A \term{Pump} is updated upon each interaction with a \term{Well} that uses it. A \term{Pump} can be shared by multiple \term{Wells} if it stores a mapping of multiple \term{Well} addresses. Each \term{Pump} can determine its own method of recording a \term{Well's} \term{Reserves}. 
 
 When there’s an interaction with a \term{Well}, the \term{Well} sends two pieces of information to its \term{Pumps}: (1) a list of \term{Reserve} amounts and (2) additional metadata as a bytestring. Each \term{Pump} is responsible for deciding how to weight the new \term{Reserve} values relative to the values it had previously and processing the bytestring. 
 
-Because storing data on-chain is expensive, only absolutely necessary data should be recorded. Each \term{Well} can be deployed with an arbitrary set of \term{Pumps}, such that only and exactly the data necessary to satisfy composability between the liquidity in the \term{Well} and arbitrary other protocols desired by the liquidity provider is recorded on-chain. \term{Pumps} create a minimalist, composable way for liquidity providers to minimize gas costs associated with trading against their liquidity while maximizing customizability for using their liquidity in other protocols.
+Because storing data on-chain is expensive, only absolutely necessary data should be recorded. Each \term{Well} can be deployed with an arbitrary set of \term{Pumps}, such that only and exactly the data necessary to satisfy composability between the liquidity in the \term{Well} and arbitrary other protocols desired by the liquidity provider is recorded on-chain. \term{Pumps} create a minimalist, composable way for liquidity providers to maximize use of their liquidity in other protocols while minimizing gas costs associated with trading against it.
 
 \subsection{Well Implementation}
-\term{Well Implementations} contain all logic to support swapping against, adding liquidity to and removing liquidity from a \term{Well} in arbitrary proportions. A \term{Well Implementation} may require a \term{Well} to have associated data which the implementation uses to properly interface with its \term{Well Function} (\textit{e.g.}, an A parameter for a Curve style stableswap invariant, a trading fee) and \term{Pumps} (\textit{e.g.}, the look-back period of a Pump). \term{Well Implementations} can specify a whitelist (or blacklist) of acceptable (or unacceptable) counterparties and/or liquidity providers.
+\vspace*{-0.1cm}
+\term{Well Implementations} contain all logic to support swapping against, adding liquidity to and removing liquidity from, a \term{Well} in arbitrary proportions. A \term{Well Implementation} may require a \term{Well} to have associated data which the implementation uses to properly interface with its \term{Well Function} (\textit{e.g.}, an A parameter for a Curve style stableswap invariant, a trading fee, etc.) and \term{Pumps} (\textit{e.g.}, the \term{Pump} look-back period). \term{Well Implementations} can specify a whitelist (or blacklist) of acceptable (or unacceptable) counterparties and/or liquidity providers.
 
 \subsection{Aquifer}
+\vspace*{-0.1cm}
 \term{Aquifer} is an instance of a \term{Well} factory (i.e., a permissionless \term{Well} deployer and registry). \term{Aquifer} deploys \term{Wells} by cloning a pre-deployed \term{Well} and stores a mapping of the new \term{Well} address to the \term{Well Implementation} address. 
 
-\term{Aquifer} creates the first layer of trust for Basin users by providing a way to verify a \term{Well's} \term{Implementation} given its address. However, users must still verify the authenticity of the \term{Well's} \term{Well Function}, \term{Pumps} and \term{Well Implementation}.
+\term{Aquifer} creates the first layer of trust for Basin users by providing a way to verify a \term{Well's} \term{Implementation}, given its address. However, users must still verify the \term{Well's} \term{Well Function}, \term{Pumps} and \term{Well Implementation}.
 
 \subsection{Aqueduct}
-\term{Aqueduct} is a whitelist of \term{Well Functions}, \term{Pumps}, \term{Well Implementations} and \term{Aquifers}. \term{Aqueducts} create a single point of trust for users of Basin components. As long as all the components of a \term{Well} are included in a trusted \term{Aqueduct}, the \term{Well} can be trusted. In practice, protocols can deploy an \term{Aqueduct} that specifies all the Basin components liquidity providers can (or must) use in order to receive some form of credit from them. 
+\term{Aqueduct} is a whitelist of \term{Well Functions}, \term{Pumps}, \term{Well Implementations} and \term{Aquifers}. \term{Aqueducts} create a single point of trust for users of Basin components. As long as all the components of a \term{Well} are included in a trusted \term{Aqueduct}, the \term{Well} can be trusted. In practice, protocols can deploy an \term{Aqueduct} that specifies all the Basin components liquidity providers can (or must) use in order to receive some form of credit from it. 
 
 \subsection{Governance}
-All components of Basin (i.e., \term{Well Functions}, \term{Pumps}, \term{Well Implementations},  \term{Aquifers}, and \term{Aqueducts}) can be, but need not be upgradable. Governance of upgrades to each component is dependent on the owner of the component. 
+All components of Basin (i.e., \term{Well Functions}, \term{Pumps}, \term{Well Implementations},  \term{Aquifers}, and \term{Aqueducts}) can, but need not, be upgradable. Governance of upgrades to each component is dependent on the owner of the component. 
 
 \section{Risks}
-There are numerous risks associated with Basin. This is not an exhaustive list.
+There are risks associated with Basin. This is not an exhaustive list.
 
-The Basin code base is novel. None of its components have been tested in the “real world” prior to its initial deployment. The open source nature of Basin means that others can take advantage of any bugs, flaws or deficiencies in it. While Basin and an initial implementation of each of its components (except \term{Aqueduct}, which has not been implemented) have been audited(UPDATE AUDIT LINK) it is no guarantee of security. 
+The Basin code base is novel. None of its components has been tested in the “real world” prior to its initial deployment. The open source nature of Basin means that others can take advantage of any bugs, flaws or deficiencies in it. While Basin and an initial implementation of each of its components (except \term{Aqueduct}, which has not been implemented) have been audited,\footnote{\href{https://basin.exchange/06-16-23-halborn-report}{basin.exchange/06-16-23-halborn-report}}$^{,}$\footnote{\href{https://basin.exchange/06-16-23-cyfrin-report}{basin.exchange/06-16-23-cyfrin-report}} it is no guarantee of security. 
 
 Particularly before the development of an \term{Aqueduct}, each component should be verified by users in order to ensure proper functionality. 
 
 \section{Future Work}
-Basin is a work in progress. The following are potential improvements that can be incorporated into Basin through future development:
+Basin is a work in progress. The following are some potential improvements that can be incorporated into Basin through future development:
 
 \begin{itemize}
 \item Support for ERC-1155\fref{ethereum.org/en/developers/docs/standards/tokens/erc-1155} and ERC-721\fref{ethereum.org/en/developers/docs/standards/tokens/erc-721} Standard tokens can be added.
